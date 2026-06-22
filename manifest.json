@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "ΔLCHIMIST — Writing & Communication Assistant",
+  "version": "1.1.0",
+  "description": "AI-powered content generation for posts, articles, and replies. User-triggered and transparent; uses your own AI key.",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "storage",
+    "unlimitedStorage",
+    "sidePanel"
+  ],
+  "optional_permissions": [
+    "downloads"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "shell.html"
+  },
+  "action": {
+    "default_title": "Open Alchimist Writing Assistant"
+  },
+  "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+  }  
+}
