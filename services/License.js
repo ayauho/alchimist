@@ -19,6 +19,16 @@ export const LICENSE_PREFIX  = 'ALCH-';
 export const LICENSE_PRODUCT = 'alchimist';
 export const LICENSE_TIER    = 'lifetime';
 
+// [PROMO] GitHub-only temporary access tokens. Email-free, expiry-gated.
+// Distinguished from signed ALCH- keys by the HN- prefix. Remove this block
+// (single commit) to retract the promo — existing activated installs keep
+// their locally-persisted 'premium' status, same as a real license holder.
+// expiresAt is epoch-ms. 2026-07-08T00:00:00Z = 1783900800000 (~2 weeks).
+export const LICENSE_PROMO_PREFIX = 'HN-';
+export const PROMO_TOKENS = {
+    'HN-ALCHEMIST-2026': { expiresAt: 1783900800000 }
+};
+
 const KEYS = {
     STATUS: 'license_status',
     EMAIL:  'license_email',
@@ -70,6 +80,12 @@ class LicenseService {
     // Returns { valid:boolean, reason?:TOKEN }. Signature is RAW IEEE-P1363 r‖s (64 bytes) —
     // generate_license.py emits raw, NOT DER. WebCrypto rejects DER, so the generator must match.
     async validate(email, key) {
+        // [PROMO] Email-free bypass lane — checked before any ALCH- format/email gate.
+        if (key && Object.prototype.hasOwnProperty.call(PROMO_TOKENS, key)) {
+            const unexpired = Date.now() < PROMO_TOKENS[key].expiresAt;
+            log('LOGIC', unexpired ? 'LICENSE_PROMO_HIT' : 'LICENSE_PROMO_REJECT', { token: key, expired: !unexpired });
+            return unexpired ? { valid: true, promo: true } : { valid: false, reason: 'ERR_LICENSE_EXPIRED' };
+        }
         if (!key || !key.startsWith(LICENSE_PREFIX)) return { valid: false, reason: 'ERR_LICENSE_FORMAT' };
         if (!email || !email.includes('@'))          return { valid: false, reason: 'ERR_LICENSE_EMPTY_EMAIL' };
         let sig;
@@ -96,9 +112,10 @@ class LicenseService {
         const res = await this.validate(email, rawKey);
         if (!res.valid) return res;
         const hash = await this._sha256Hex(rawKey); // raw key is NEVER persisted
+        const _email = (email || '').toLowerCase().trim();
         await Storage.set({
             [KEYS.STATUS]: 'premium',
-            [KEYS.EMAIL]:  email.toLowerCase().trim(),
+            ...(_email ? { [KEYS.EMAIL]: _email } : {}),
             [KEYS.HASH]:   hash,
             [KEYS.AT]:     Date.now()
         });

@@ -55,6 +55,7 @@ const TEXTS = {
     ERR_LICENSE_EMPTY_EMAIL: { en: "Enter the email you used at purchase." },
     ERR_LICENSE_EMPTY_KEY: { en: "Enter your license key." },
     ERR_LICENSE_CRYPTO: { en: "Validation failed. Please try again." },
+    ERR_LICENSE_EXPIRED: { en: "Promo key has expired." },
     BTN_REVOKE_SUBSTRATE: { en: "Revoke Substrate" },
     SIGNATURE_DEFAULT: { en: "Transmuted via ΔLCHIMIST 🧪" },
     MSG_TRANSMUTE_STARTED: { en: "Engaging Crucible Void..." },

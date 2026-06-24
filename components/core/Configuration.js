@@ -354,6 +354,10 @@ export class Configuration {
         keyGroup.appendChild(dom.create('label', 'input-label', { innerText: Language.text('LABEL_LICENSE_KEY') || 'License key' }));
         const keyInput = dom.create('input', 'alchimist-input', { type: 'text', placeholder: Language.text('PLACEHOLDER_LICENSE_KEY') || 'ALCH-…' });
         keyGroup.appendChild(keyInput);
+        // [PROMO] Promo tokens are email-free; hide the email field when one is detected.
+        keyInput.addEventListener('input', () => {
+            emailGroup.hidden = keyInput.value.trim().toUpperCase().startsWith('HN-');
+        });
         const msg = dom.create('div', 'text-[10px] mt-1');
         const actBtn = dom.create('button', 'alchimist-input mt-2 cursor-pointer', { innerText: Language.text('BTN_ACTIVATE_LICENSE') || 'Activate License' });
         actBtn.onclick = async () => {
